@@ -5,7 +5,7 @@ export const jwtConstants = {
 
 export const TOKEN_EXPIRATION = {
   HOURS: '7h',
-  DAYS: '7d ',
+  DAYS: '7d',
   MONTH: '30d',
   YEAR: '1y',
   TEST: '2m',

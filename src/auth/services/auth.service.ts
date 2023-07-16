@@ -10,6 +10,7 @@ import { Model } from 'mongoose';
 import { UsersService } from '@users/services/users.service';
 import { PasswordService } from '@users/services/password.service';
 import { User } from '@users/schemas/user.schema';
+import { UserInterface } from '@users/interfaces/user.interface';
 
 @Injectable()
 export class AuthService {
@@ -20,23 +21,31 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
-  async generateJWT(username: string): Promise<{ access_token: string }> {
+  async generateJWT(
+    username: string,
+    id: string,
+  ): Promise<{ access_token: string }> {
     return {
-      access_token: await this.jwtService.signAsync({ username: username }),
+      access_token: await this.jwtService.signAsync({
+        username: username,
+        id: id,
+      }),
     };
   }
 
   async signUp(createUserDto) {
     try {
-      const { email, username } = createUserDto;
+      const { email } = createUserDto;
       const existingUser = await this.userModel.findOne({ email });
 
       if (existingUser) {
         return new BadRequestException('User already existing');
       }
 
-      await this.usersService.createUser(createUserDto);
-      return await this.generateJWT(username);
+      const createdUser: UserInterface = await this.usersService.createUser(
+        createUserDto,
+      );
+      return await this.generateJWT(createdUser.username, createdUser.userId);
     } catch (e) {
       console.log('ERROR:[SIGN_UP]', e);
     }
@@ -44,17 +53,15 @@ export class AuthService {
 
   async signIn(username: string, password: string) {
     try {
-      const user = await this.usersService.findOne(username);
-      const isValidPassword = await this.passwordService.isValidPassword(
-        password,
-        user?.password,
-      );
+      const user: UserInterface = await this.usersService.findOne(username);
+      const isValidPassword: boolean =
+        await this.passwordService.isValidPassword(password, user?.password);
 
       if (!isValidPassword) {
         throw new UnauthorizedException();
       }
 
-      return await this.generateJWT(user.username);
+      return await this.generateJWT(user.username, user.userId);
     } catch (e) {
       console.log('ERROR:[SIGN_IN]', e);
     }
