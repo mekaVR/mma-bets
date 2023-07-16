@@ -16,7 +16,7 @@ import { AUTH_PATH } from '@auth/constants/path.constants';
 export class AuthController {
   constructor(private authService: AuthService) {}
   @Public()
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @Post(AUTH_PATH.REGISTER)
   signUp(@Body() signUpDto: CreateUserDto) {
     return this.authService.signUp(signUpDto);
