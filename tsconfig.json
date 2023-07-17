@@ -14,6 +14,7 @@
       "@auth/*": ["src/auth/*"],
       "@users/*": ["src/users/*"],
       "@fighters/*": ["src/fighters/*"],
+      "@fights/*": ["src/fights/*"],
     },
     "incremental": true,
     "skipLibCheck": true,
