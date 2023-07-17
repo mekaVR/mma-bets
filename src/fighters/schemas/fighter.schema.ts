@@ -5,7 +5,7 @@ import {
   STRING,
   NUMBER_REQUIRED,
   NUMBER,
-} from '../../utils/models';
+} from '@utils/models';
 
 export const FighterSchema = new Schema<Fighter>({
   firstName: { ...STRING_REQUIRED },

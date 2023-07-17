@@ -1,40 +1,6 @@
 import { Schema } from 'mongoose';
 import { User } from '@users/interfaces/user.interface';
-import { BOOLEAN, NUMBER, STRING, STRING_REQUIRED } from '../../utils/models';
-
-/*export type UserDocument = HydratedDocument<User>;
-
-@Schema()
-export class User {
-  @Prop({ required: true })
-  username: string;
-
-  @Prop({ required: true })
-  password: string;
-
-  @Prop({ required: true })
-  email: string;
-
-  @Prop()
-  picture: string;
-
-  @Prop()
-  score: number;
-
-  @Prop()
-  rank: number;
-
-  @Prop()
-  badges: string[];
-
-  @Prop()
-  coinsBonus: number;
-
-  @Prop()
-  admin: boolean;
-}
-
-export const UserSchema = SchemaFactory.createForClass(User);*/
+import { BOOLEAN, NUMBER, STRING, STRING_REQUIRED } from '@utils/models';
 
 export const UserSchema = new Schema<User>({
   username: { ...STRING_REQUIRED },
