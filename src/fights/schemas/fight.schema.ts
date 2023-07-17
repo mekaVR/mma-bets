@@ -7,7 +7,7 @@ import {
   NUMBER_REQUIRED,
   STRING,
   STRING_REQUIRED,
-} from '../../utils/models';
+} from '@utils/models';
 
 export const FightSchema = new Schema<Fight>({
   date: { ...DATE_REQUIRED },
