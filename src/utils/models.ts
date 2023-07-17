@@ -32,3 +32,8 @@ export const DATE = {
   type: Date,
   required: false,
 };
+
+export const DATE_REQUIRED = {
+  type: Date,
+  required: true,
+};

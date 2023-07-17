@@ -47,10 +47,7 @@ export class UsersService {
     }
   }
 
-  async updateUser(
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<IUser> {
+  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<IUser> {
     try {
       const userUpdate = await this.userModel.findByIdAndUpdate(
         id,

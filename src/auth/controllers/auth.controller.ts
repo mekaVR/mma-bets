@@ -22,10 +22,11 @@ export class AuthController {
     return this.authService.signUp(signUpDto);
   }
 
+  // TODO add good type 'PROMISE<SignInDto>
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post(AUTH_PATH.LOGIN)
-  signIn(@Body() signInDto: Record<string, any>) {
+  signIn(@Body() signInDto: Record<string, string>) {
     return this.authService.signIn(signInDto.username, signInDto.password);
   }
   @Get(AUTH_PATH.PROFILE)
