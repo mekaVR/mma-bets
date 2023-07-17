@@ -1,4 +1,6 @@
-export interface UserInterface {
+import { Document } from 'mongoose';
+
+export interface IUser {
   password?: string;
   userId: string;
   username: string;
@@ -10,3 +12,5 @@ export interface UserInterface {
   coinsBonus?: number;
   admin?: boolean;
 }
+
+export type User = IUser & Document;

@@ -1,5 +1,3 @@
-import { Schema } from 'mongoose';
-
 export const STRING = {
   type: String,
   required: false,

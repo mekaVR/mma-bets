@@ -8,11 +8,11 @@ import { AuthGuard } from '@auth/auth.guard';
 import { AuthService } from '@auth/services/auth.service';
 import { jwtConstants, TOKEN_EXPIRATION } from '@auth/constants/jwt.constants';
 import { UsersModule } from '@users/users.module';
-import { User, UserSchema } from '@users/schemas/user.schema';
+import { UserSchema } from '@users/schemas/user.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     UsersModule,
     JwtModule.register({
       global: true,

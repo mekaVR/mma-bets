@@ -6,7 +6,7 @@ import { SALT_ROUNDS } from '@users/constants/password.constants';
 export class PasswordService {
   async encryptPassword(password: string): Promise<string> {
     try {
-      const salt = await bcrypt.genSalt(SALT_ROUNDS);
+      const salt: string = await bcrypt.genSalt(SALT_ROUNDS);
       return await bcrypt.hash(password, salt);
     } catch (e) {
       console.log('ERROR:[ENCRYPT_PASSWORD]', e);

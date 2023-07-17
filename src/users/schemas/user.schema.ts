@@ -1,7 +1,8 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Schema } from 'mongoose';
+import { User } from '@users/interfaces/user.interface';
+import { BOOLEAN, NUMBER, STRING, STRING_REQUIRED } from '../../utils/models';
 
-export type UserDocument = HydratedDocument<User>;
+/*export type UserDocument = HydratedDocument<User>;
 
 @Schema()
 export class User {
@@ -33,4 +34,24 @@ export class User {
   admin: boolean;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const UserSchema = SchemaFactory.createForClass(User);*/
+
+export const UserSchema = new Schema<User>({
+  username: { ...STRING_REQUIRED },
+
+  password: { ...STRING_REQUIRED },
+
+  email: { ...STRING_REQUIRED },
+
+  picture: { ...STRING },
+
+  score: { ...NUMBER },
+
+  rank: { ...NUMBER },
+
+  badges: [{ ...STRING }],
+
+  coinsBonus: { ...NUMBER },
+
+  admin: { ...BOOLEAN },
+});

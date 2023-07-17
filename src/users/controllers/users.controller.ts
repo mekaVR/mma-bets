@@ -15,19 +15,19 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from '@users/services/users.service';
 import { UpdateUserDto } from '@users/dto/update-user.dto';
 import { storage } from '@users/utils/storage';
-import { UserInterface } from '@users/interfaces/user.interface';
+import { IUser } from '@users/interfaces/user.interface';
 
 @Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
 
   @Get()
-  getAll(): Promise<UserInterface[] | []> {
+  getAll(): Promise<IUser[] | []> {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  getUser(@Param('id') id: string): Promise<UserInterface> {
+  getUser(@Param('id') id: string): Promise<IUser> {
     return this.userService.findOne(id);
   }
   @Patch(':id')

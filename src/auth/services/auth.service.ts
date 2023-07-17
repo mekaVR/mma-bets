@@ -9,8 +9,7 @@ import { Model } from 'mongoose';
 
 import { UsersService } from '@users/services/users.service';
 import { PasswordService } from '@users/services/password.service';
-import { User } from '@users/schemas/user.schema';
-import { UserInterface } from '@users/interfaces/user.interface';
+import { User, IUser } from '@users/interfaces/user.interface';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +17,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private passwordService: PasswordService,
-    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel('User') private userModel: Model<User>,
   ) {}
 
   async generateJWT(
@@ -42,7 +41,7 @@ export class AuthService {
         return new BadRequestException('User already existing');
       }
 
-      const createdUser: UserInterface = await this.usersService.createUser(
+      const createdUser: IUser = await this.usersService.createUser(
         createUserDto,
       );
       return await this.generateJWT(createdUser.username, createdUser.userId);
@@ -53,7 +52,7 @@ export class AuthService {
 
   async signIn(username: string, password: string) {
     try {
-      const user: UserInterface = await this.usersService.findOne(username);
+      const user: IUser = await this.usersService.findOne(username);
       const isValidPassword: boolean =
         await this.passwordService.isValidPassword(password, user?.password);
 
