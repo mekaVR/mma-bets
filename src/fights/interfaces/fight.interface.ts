@@ -1,14 +1,14 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export interface IFight {
   date: Date;
-  event: string; // TODO EVENT OBJECT
+  event: Types.ObjectId;
   division: string;
   championship: boolean;
-  fighters: string[]; // TODO FighterID
+  fighters: Types.ObjectId[];
   rounds: number;
-  winner?: string; // TODO FighterID
-  loser?: string; // TODO FighterID
+  winner?: Types.ObjectId;
+  loser?: Types.ObjectId;
   method?: string;
   round?: number;
   time?: number;

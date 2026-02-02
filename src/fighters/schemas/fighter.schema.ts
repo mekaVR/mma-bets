@@ -1,36 +1,33 @@
 import { Schema } from 'mongoose';
 import { Fighter } from '@fighters/interfaces/fighter.interface';
-import {
-  STRING_REQUIRED,
-  STRING,
-  NUMBER_REQUIRED,
-  NUMBER,
-} from '@utils/models';
 
-export const FighterSchema = new Schema<Fighter>({
-  firstName: { ...STRING_REQUIRED },
-  lastName: { ...STRING_REQUIRED },
-  nickName: { ...STRING },
-  picture: { ...STRING },
-  record: { ...STRING }, // WINS - LOSS - DRAWS? - NO_CONTESTS?
-  wins: {
-    koTko: { ...NUMBER_REQUIRED },
-    submission: { ...NUMBER_REQUIRED },
-    decisions: { ...NUMBER_REQUIRED },
+export const FighterSchema = new Schema<Fighter>(
+  {
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    nickName: { type: String },
+    picture: { type: String },
+    record: { type: String },
+    wins: {
+      koTko: { type: Number, required: true, default: 0 },
+      submission: { type: Number, required: true, default: 0 },
+      decisions: { type: Number, required: true, default: 0 },
+    },
+    loss: {
+      koTko: { type: Number, required: true, default: 0 },
+      submission: { type: Number, required: true, default: 0 },
+      decisions: { type: Number, required: true, default: 0 },
+    },
+    draws: { type: Number, default: 0 },
+    noContests: { type: Number, default: 0 },
+    height: { type: Number, required: true },
+    weight: { type: Number, required: true },
+    reach: { type: Number, required: true },
+    divisions: { type: String, required: true },
+    age: { type: Number, required: true },
+    team: { type: String },
+    country: { type: String },
+    styles: [{ type: String }],
   },
-  loss: {
-    koTko: { ...NUMBER_REQUIRED },
-    submission: { ...NUMBER_REQUIRED },
-    decisions: { ...NUMBER_REQUIRED },
-  },
-  draws: { ...NUMBER },
-  noContests: { ...NUMBER },
-  height: { ...NUMBER_REQUIRED },
-  weight: { ...NUMBER_REQUIRED },
-  reach: { ...NUMBER_REQUIRED },
-  divisions: { ...STRING_REQUIRED },
-  age: { ...NUMBER_REQUIRED },
-  team: { ...STRING },
-  country: { ...STRING },
-  styles: [{ ...STRING }],
-});
+  { timestamps: true },
+);
