@@ -8,9 +8,7 @@ import { Fighter, IFighter } from '@fighters/interfaces/fighter.interface';
 export class FightersService {
   constructor(@InjectModel('Fighter') private fighterModel: Model<Fighter>) {}
 
-  async findAllFighters(): Promise<IFighter[] | []> {
-    try {
-      return await this.fighterModel.find();
-    } catch (e) {}
+  async findAllFighters(): Promise<IFighter[]> {
+    return this.fighterModel.find();
   }
 }

@@ -33,36 +33,30 @@ export class AuthService {
   }
 
   async signUp(createUserDto) {
-    try {
-      const { email } = createUserDto;
-      const existingUser = await this.userModel.findOne({ email });
+    const { email } = createUserDto;
+    const existingUser = await this.userModel.findOne({ email });
 
-      if (existingUser) {
-        throw new ConflictException('Un utilisateur avec cet email existe déjà');
-      }
-
-      const createdUser: IUser = await this.usersService.createUser(
-        createUserDto,
-      );
-      return await this.generateJWT(createdUser.username, createdUser.userId);
-    } catch (e) {
-      console.log('ERROR:[SIGN_UP]', e);
+    if (existingUser) {
+      throw new ConflictException('Un utilisateur avec cet email existe déjà');
     }
+
+    const createdUser: IUser = await this.usersService.createUser(
+      createUserDto,
+    );
+    return this.generateJWT(createdUser.username, createdUser.userId);
   }
 
   async signIn(username: string, password: string) {
-    try {
-      const user: IUser = await this.usersService.findOne(username);
-      const isValidPassword: boolean =
-        await this.passwordService.isValidPassword(password, user?.password);
+    const user: IUser = await this.usersService.findOne(username);
+    const isValidPassword: boolean = await this.passwordService.isValidPassword(
+      password,
+      user?.password,
+    );
 
-      if (!isValidPassword) {
-        throw new UnauthorizedException();
-      }
-
-      return await this.generateJWT(user.username, user.userId);
-    } catch (e) {
-      console.log('ERROR:[SIGN_IN]', e);
+    if (!isValidPassword) {
+      throw new UnauthorizedException();
     }
+
+    return this.generateJWT(user.username, user.userId);
   }
 }

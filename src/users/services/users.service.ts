@@ -16,71 +16,43 @@ export class UsersService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<IUser> {
-    try {
-      const { password } = createUserDto;
-      createUserDto.password = await this.passwordService.encryptPassword(
-        password,
-      );
-      const createdUser = new this.userModel(createUserDto);
-      createdUser.save();
-      return userFormater(createdUser);
-    } catch (e) {
-      console.log('ERROR:[CREATE_USER]', e);
-    }
+    const { password } = createUserDto;
+    createUserDto.password = await this.passwordService.encryptPassword(password);
+    const createdUser = new this.userModel(createUserDto);
+    await createdUser.save();
+    return userFormater(createdUser);
   }
 
-  async findAll(): Promise<IUser[] | []> {
-    try {
-      const users = await this.userModel.find();
-      return users.map((user) => userFormater(user));
-    } catch (e) {
-      console.log('ERROR:[FIND_ALL]', e);
-    }
+  async findAll(): Promise<IUser[]> {
+    const users = await this.userModel.find();
+    return users.map((user) => userFormater(user));
   }
 
   async findOne(id: string): Promise<IUser> {
-    try {
-      const user = await this.userModel.findById(id);
-      return userFormater(user);
-    } catch (e) {
-      console.log('ERROR:[FIND_ONE]', e);
-    }
+    const user = await this.userModel.findById(id);
+    return userFormater(user);
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<IUser> {
-    try {
-      const userUpdate = await this.userModel.findByIdAndUpdate(
-        id,
-        updateUserDto,
-        { new: true },
-      );
-      return userFormater(userUpdate);
-    } catch (e) {
-      console.log('ERROR:[UPDATE]', e);
-    }
+    const userUpdate = await this.userModel.findByIdAndUpdate(
+      id,
+      updateUserDto,
+      { new: true },
+    );
+    return userFormater(userUpdate);
   }
 
-  // TODO storage in bucket or local and return good url
-  // for display avatar
-  async updatePicture(id: string, updatePictureDto: any): Promise<any> {
-    try {
-      const { filename } = updatePictureDto;
-      const userUpated = await this.userModel.findByIdAndUpdate(
-        id,
-        { picture: filename },
-        { new: true },
-      );
-      return userFormater(userUpated);
-    } catch (e) {
-      console.log('ERROR:[UPLOAD_PICTURE]', e);
-    }
+  async updatePicture(id: string, updatePictureDto: any): Promise<IUser> {
+    const { filename } = updatePictureDto;
+    const userUpdated = await this.userModel.findByIdAndUpdate(
+      id,
+      { picture: filename },
+      { new: true },
+    );
+    return userFormater(userUpdated);
   }
 
   async deleteUser(id: string) {
-    try {
-      return await this.userModel.findByIdAndDelete(id);
-    } catch (e) {
-      console.log('ERROR:[deleteUser]', e);
-    }
+    return this.userModel.findByIdAndDelete(id);
   }
 }
