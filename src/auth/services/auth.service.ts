@@ -33,11 +33,16 @@ export class AuthService {
   }
 
   async signUp(createUserDto) {
-    const { email } = createUserDto;
-    const existingUser = await this.userModel.findOne({ email });
+    const { email, username } = createUserDto;
 
-    if (existingUser) {
+    const existingEmail = await this.userModel.findOne({ email });
+    if (existingEmail) {
       throw new ConflictException('Un utilisateur avec cet email existe déjà');
+    }
+
+    const existingUsername = await this.userModel.findOne({ username });
+    if (existingUsername) {
+      throw new ConflictException("Ce nom d'utilisateur est déjà pris");
     }
 
     const createdUser: IUser = await this.usersService.createUser(
