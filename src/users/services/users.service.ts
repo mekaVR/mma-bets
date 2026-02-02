@@ -17,7 +17,9 @@ export class UsersService {
 
   async createUser(createUserDto: CreateUserDto): Promise<IUser> {
     const { password } = createUserDto;
-    createUserDto.password = await this.passwordService.encryptPassword(password);
+    createUserDto.password = await this.passwordService.encryptPassword(
+      password,
+    );
     const createdUser = new this.userModel(createUserDto);
     await createdUser.save();
     return userFormater(createdUser);
@@ -31,6 +33,10 @@ export class UsersService {
   async findOne(id: string): Promise<IUser> {
     const user = await this.userModel.findById(id);
     return userFormater(user);
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userModel.findOne({ email });
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<IUser> {

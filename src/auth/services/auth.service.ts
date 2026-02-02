@@ -46,17 +46,22 @@ export class AuthService {
     return this.generateJWT(createdUser.username, createdUser.userId);
   }
 
-  async signIn(username: string, password: string) {
-    const user: IUser = await this.usersService.findOne(username);
-    const isValidPassword: boolean = await this.passwordService.isValidPassword(
+  async signIn(email: string, password: string) {
+    const user = await this.usersService.findByEmail(email);
+
+    if (!user) {
+      throw new UnauthorizedException('Email ou mot de passe incorrect');
+    }
+
+    const isValidPassword = await this.passwordService.isValidPassword(
       password,
-      user?.password,
+      user.password,
     );
 
     if (!isValidPassword) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
 
-    return this.generateJWT(user.username, user.userId);
+    return this.generateJWT(user.username, user._id.toString());
   }
 }
