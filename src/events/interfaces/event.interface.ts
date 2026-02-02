@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export interface IEvent {
   name: string;
@@ -6,7 +6,7 @@ export interface IEvent {
   season?: string;
   date: Date;
   location: string;
-  fights: string[]; // TODO FightID
+  fights: Types.ObjectId[];
   league?: string;
   picture: string;
 }

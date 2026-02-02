@@ -1,23 +1,17 @@
 import { Schema } from 'mongoose';
 import { User } from '@users/interfaces/user.interface';
-import { BOOLEAN, NUMBER, STRING, STRING_REQUIRED } from '@utils/models';
 
-export const UserSchema = new Schema<User>({
-  username: { ...STRING_REQUIRED },
-
-  password: { ...STRING_REQUIRED },
-
-  email: { ...STRING_REQUIRED },
-
-  picture: { ...STRING },
-
-  score: { ...NUMBER },
-
-  rank: { ...NUMBER },
-
-  badges: [{ ...STRING }],
-
-  coinsBonus: { ...NUMBER },
-
-  admin: { ...BOOLEAN },
-});
+export const UserSchema = new Schema<User>(
+  {
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    picture: { type: String },
+    score: { type: Number, default: 0 },
+    rank: { type: Number },
+    badges: [{ type: String }],
+    coinsBonus: { type: Number, default: 0 },
+    admin: { type: Boolean, default: false },
+  },
+  { timestamps: true },
+);

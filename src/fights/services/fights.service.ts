@@ -9,10 +9,6 @@ export class FightsService {
   constructor(@InjectModel('Fight') private fightModel: Model<Fight>) {}
 
   async findAllFights(): Promise<IFight[]> {
-    try {
-      return await this.fightModel.find();
-    } catch (e) {
-      console.log('ERROR:[FIND_ALL_FIGHTS]', e);
-    }
+    return this.fightModel.find();
   }
 }

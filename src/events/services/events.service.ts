@@ -8,11 +8,7 @@ import { Event, IEvent } from '@events/interfaces/event.interface';
 export class EventsService {
   constructor(@InjectModel('Event') private eventModel: Model<Event>) {}
 
-  async findAllEvents(): Promise<IEvent[] | []> {
-    try {
-      return await this.eventModel.find();
-    } catch (e) {
-      console.log('ERROR:[FIND_ALL_EVENTS]', e);
-    }
+  async findAllEvents(): Promise<IEvent[]> {
+    return this.eventModel.find();
   }
 }

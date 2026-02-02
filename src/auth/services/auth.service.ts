@@ -1,5 +1,5 @@
 import {
-  BadRequestException,
+  ConflictException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -9,7 +9,9 @@ import { Model } from 'mongoose';
 
 import { UsersService } from '@users/services/users.service';
 import { PasswordService } from '@users/services/password.service';
-import { User, IUser } from '@users/interfaces/user.interface';
+import { CreateUserDto } from '@users/dto/create-user.dto';
+import { UserEntity } from '@users/entities/user.entity';
+import { User } from '@users/interfaces/user.interface';
 
 @Injectable()
 export class AuthService {
@@ -32,37 +34,41 @@ export class AuthService {
     };
   }
 
-  async signUp(createUserDto) {
-    try {
-      const { email } = createUserDto;
-      const existingUser = await this.userModel.findOne({ email });
+  async signUp(createUserDto: CreateUserDto) {
+    const { email, username } = createUserDto;
 
-      if (existingUser) {
-        return new BadRequestException('User already existing');
-      }
-
-      const createdUser: IUser = await this.usersService.createUser(
-        createUserDto,
-      );
-      return await this.generateJWT(createdUser.username, createdUser.userId);
-    } catch (e) {
-      console.log('ERROR:[SIGN_UP]', e);
+    const existingEmail = await this.userModel.findOne({ email });
+    if (existingEmail) {
+      throw new ConflictException('Un utilisateur avec cet email existe déjà');
     }
+
+    const existingUsername = await this.userModel.findOne({ username });
+    if (existingUsername) {
+      throw new ConflictException("Ce nom d'utilisateur est déjà pris");
+    }
+
+    const createdUser: UserEntity = await this.usersService.createUser(
+      createUserDto,
+    );
+    return this.generateJWT(createdUser.username, createdUser.userId);
   }
 
-  async signIn(username: string, password: string) {
-    try {
-      const user: IUser = await this.usersService.findOne(username);
-      const isValidPassword: boolean =
-        await this.passwordService.isValidPassword(password, user?.password);
+  async signIn(email: string, password: string) {
+    const user = await this.usersService.findByEmail(email);
 
-      if (!isValidPassword) {
-        throw new UnauthorizedException();
-      }
-
-      return await this.generateJWT(user.username, user.userId);
-    } catch (e) {
-      console.log('ERROR:[SIGN_IN]', e);
+    if (!user) {
+      throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
+
+    const isValidPassword = await this.passwordService.isValidPassword(
+      password,
+      user.password,
+    );
+
+    if (!isValidPassword) {
+      throw new UnauthorizedException('Email ou mot de passe incorrect');
+    }
+
+    return this.generateJWT(user.username, user._id.toString());
   }
 }

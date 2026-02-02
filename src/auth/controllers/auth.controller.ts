@@ -9,12 +9,15 @@ import {
 } from '@nestjs/common';
 import { AuthService } from '@auth/services/auth.service';
 import { Public } from '@auth/decorators/public.decorator';
+import { SignInDto } from '@auth/dto/sign-in.dto';
+import { AuthenticatedRequest } from '@auth/interfaces/authenticated-request.interface';
 import { CreateUserDto } from '@users/dto/create-user.dto';
 import { AUTH_PATH } from '@auth/constants/path.constants';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
   @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post(AUTH_PATH.REGISTER)
@@ -22,15 +25,15 @@ export class AuthController {
     return this.authService.signUp(signUpDto);
   }
 
-  // TODO add good type 'PROMISE<SignInDto>
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post(AUTH_PATH.LOGIN)
-  signIn(@Body() signInDto: Record<string, string>) {
-    return this.authService.signIn(signInDto.username, signInDto.password);
+  signIn(@Body() signInDto: SignInDto) {
+    return this.authService.signIn(signInDto.email, signInDto.password);
   }
+
   @Get(AUTH_PATH.PROFILE)
-  getProfile(@Request() req) {
+  getProfile(@Request() req: AuthenticatedRequest) {
     return req.user;
   }
 }
