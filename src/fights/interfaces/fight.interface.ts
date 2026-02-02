@@ -8,7 +8,7 @@ export interface IFight {
   fighters: string[]; // TODO FighterID
   rounds: number;
   winner?: string; // TODO FighterID
-  looser?: string; // TODO FighterID
+  loser?: string; // TODO FighterID
   method?: string;
   round?: number;
   time?: number;

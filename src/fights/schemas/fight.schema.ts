@@ -17,7 +17,7 @@ export const FightSchema = new Schema<Fight>({
   fighters: [{ ...STRING_REQUIRED }], // TODO FighterID
   rounds: { ...NUMBER_REQUIRED },
   winner: { ...STRING }, // TODO FighterID
-  looser: { ...STRING }, //TODO FighterID
+  loser: { ...STRING }, // TODO FighterID
   method: { ...STRING },
   round: { ...NUMBER },
   time: { ...NUMBER },
