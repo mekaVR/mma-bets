@@ -10,6 +10,7 @@ import {
 import { AuthService } from '@auth/services/auth.service';
 import { Public } from '@auth/decorators/public.decorator';
 import { SignInDto } from '@auth/dto/sign-in.dto';
+import { AuthenticatedRequest } from '@auth/interfaces/authenticated-request.interface';
 import { CreateUserDto } from '@users/dto/create-user.dto';
 import { AUTH_PATH } from '@auth/constants/path.constants';
 
@@ -32,7 +33,7 @@ export class AuthController {
   }
 
   @Get(AUTH_PATH.PROFILE)
-  getProfile(@Request() req) {
+  getProfile(@Request() req: AuthenticatedRequest) {
     return req.user;
   }
 }

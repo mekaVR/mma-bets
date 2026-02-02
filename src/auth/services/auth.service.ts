@@ -9,7 +9,9 @@ import { Model } from 'mongoose';
 
 import { UsersService } from '@users/services/users.service';
 import { PasswordService } from '@users/services/password.service';
-import { User, IUser } from '@users/interfaces/user.interface';
+import { CreateUserDto } from '@users/dto/create-user.dto';
+import { UserEntity } from '@users/entities/user.entity';
+import { User } from '@users/interfaces/user.interface';
 
 @Injectable()
 export class AuthService {
@@ -32,7 +34,7 @@ export class AuthService {
     };
   }
 
-  async signUp(createUserDto) {
+  async signUp(createUserDto: CreateUserDto) {
     const { email, username } = createUserDto;
 
     const existingEmail = await this.userModel.findOne({ email });
@@ -45,7 +47,7 @@ export class AuthService {
       throw new ConflictException("Ce nom d'utilisateur est déjà pris");
     }
 
-    const createdUser: IUser = await this.usersService.createUser(
+    const createdUser: UserEntity = await this.usersService.createUser(
       createUserDto,
     );
     return this.generateJWT(createdUser.username, createdUser.userId);

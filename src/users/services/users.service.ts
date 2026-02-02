@@ -3,10 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { CreateUserDto } from '@users/dto/create-user.dto';
-import { PasswordService } from '@users/services/password.service';
 import { UpdateUserDto } from '@users/dto/update-user.dto';
-import { userFormater } from '@users/formaters/user.formater';
-import { User, IUser } from '@users/interfaces/user.interface';
+import { UpdatePictureDto } from '@users/dto/update-picture.dto';
+import { PasswordService } from '@users/services/password.service';
+import { UserEntity } from '@users/entities/user.entity';
+import { User } from '@users/interfaces/user.interface';
 
 @Injectable()
 export class UsersService {
@@ -15,47 +16,53 @@ export class UsersService {
     private passwordService: PasswordService,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<IUser> {
+  async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
     const { password } = createUserDto;
     createUserDto.password = await this.passwordService.encryptPassword(
       password,
     );
     const createdUser = new this.userModel(createUserDto);
     await createdUser.save();
-    return userFormater(createdUser);
+    return new UserEntity(createdUser.toObject());
   }
 
-  async findAll(): Promise<IUser[]> {
+  async findAll(): Promise<UserEntity[]> {
     const users = await this.userModel.find();
-    return users.map((user) => userFormater(user));
+    return users.map((user) => new UserEntity(user.toObject()));
   }
 
-  async findOne(id: string): Promise<IUser> {
+  async findOne(id: string): Promise<UserEntity> {
     const user = await this.userModel.findById(id);
-    return userFormater(user);
+    return new UserEntity(user.toObject());
   }
 
   async findByEmail(email: string): Promise<User | null> {
     return this.userModel.findOne({ email });
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<IUser> {
+  async updateUser(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserEntity> {
     const userUpdate = await this.userModel.findByIdAndUpdate(
       id,
       updateUserDto,
       { new: true },
     );
-    return userFormater(userUpdate);
+    return new UserEntity(userUpdate.toObject());
   }
 
-  async updatePicture(id: string, updatePictureDto: any): Promise<IUser> {
+  async updatePicture(
+    id: string,
+    updatePictureDto: UpdatePictureDto,
+  ): Promise<UserEntity> {
     const { filename } = updatePictureDto;
     const userUpdated = await this.userModel.findByIdAndUpdate(
       id,
       { picture: filename },
       { new: true },
     );
-    return userFormater(userUpdated);
+    return new UserEntity(userUpdated.toObject());
   }
 
   async deleteUser(id: string) {
