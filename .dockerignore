@@ -1,0 +1,15 @@
+# Dépendances locales (on les réinstalle dans le conteneur)
+node_modules
+
+# Build local (on recompile dans le conteneur)
+dist
+
+# Fichiers Git
+.git
+.gitignore
+
+# Tests et couverture
+coverage
+
+# Fichiers d'environnement (contiennent des secrets)
+.env
