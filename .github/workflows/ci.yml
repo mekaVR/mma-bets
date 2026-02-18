@@ -29,8 +29,11 @@ jobs:
       - name: Installation des dépendances
         run: npm ci
 
-      - name: Lancement des tests
-        run: npm test
+      - name: Vérification du lint
+        run: npm run lint
+
+      - name: Lancement des tests avec coverage
+        run: npm run test:cov
         env:
           MONGODB_URI: mongodb://localhost:27017/mmaBet-test
           JWT_SECRET: ci_test_secret
