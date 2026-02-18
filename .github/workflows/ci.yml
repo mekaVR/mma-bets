@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: ['*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Installation de Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: Lancement des tests
+        run: npm test
+        env:
+          MONGODB_URI: mongodb://localhost:27017/mmaBet-test
+          JWT_SECRET: ci_test_secret
+          JWT_EXPIRATION: 7d
+
+      - name: Build de l'application
+        run: npm run build
