@@ -1,40 +1,27 @@
 services:
   # --- Base de données ---
   mongo:
-    # Image officielle MongoDB
     image: mongo:7
-    # Nom du conteneur (plus lisible dans docker ps)
     container_name: mma-bet-mongo
-    # Redémarre automatiquement si le conteneur crash
     restart: unless-stopped
-    # Connecte le port 27017 de ta machine au conteneur
-    # (utile pour se connecter avec Compass ou mongosh depuis ta machine)
     ports:
       - '27017:27017'
-    # Stocke les données dans un volume pour ne pas les perdre quand le conteneur s'arrête
     volumes:
       - mongo-data:/data/db
 
   # --- API NestJS ---
   api:
-    # Construis l'image depuis le Dockerfile du dossier courant
     build: .
     container_name: mma-bet-api
     restart: unless-stopped
-    # Connecte le port 3000
     ports:
       - '3000:3000'
-    # Variables d'environnement pour l'API
+    env_file:
+      - .env
     environment:
-      # "mongo" ici = le nom du service au-dessus. Docker Compose crée un réseau
-      # interne où les services se trouvent par leur nom
       MONGODB_URI: mongodb://mongo:27017/mmaBet
-      JWT_SECRET: dev_secret_key_change_me
-      JWT_EXPIRATION: 7d
-    # Attend que MongoDB soit lancé avant de démarrer l'API
     depends_on:
       - mongo
 
-# Volume nommé pour persister les données MongoDB entre les redémarrages
 volumes:
   mongo-data:
