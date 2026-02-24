@@ -1,44 +1,66 @@
-import { Exclude, Expose, Transform } from 'class-transformer';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Exclude } from 'class-transformer';
 
-export class UserEntity {
-  @Expose()
-  @Transform(({ obj }) => obj._id?.toString())
-  userId: string;
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin',
+}
 
-  @Expose()
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({
+    unique: true,
+  })
   username: string;
 
-  @Expose()
+  @Column({
+    nullable: true,
+  })
+  firstName: string | null;
+
+  @Column({
+    nullable: true,
+  })
+  lastName: string | null;
+
+  @Column({
+    unique: true,
+  })
   email: string;
 
+  @Column()
   @Exclude()
   password: string;
 
-  @Expose()
+  @Column({
+    nullable: true,
+  })
   picture: string | null;
 
-  @Expose()
+  @Column({
+    default: 0,
+  })
   score: number;
 
-  @Expose()
-  rank: number;
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role: UserRole;
 
-  @Expose()
-  badges: string[];
+  @CreateDateColumn()
+  createdAt: Date;
 
-  @Expose()
-  coinsBonus: number;
-
-  @Exclude()
-  admin: boolean;
-
-  @Exclude()
-  __v: number;
-
-  @Exclude()
-  _id: string;
-
-  constructor(partial: Partial<UserEntity>) {
-    Object.assign(this, partial);
-  }
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

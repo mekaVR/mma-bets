@@ -11,10 +11,14 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      mongo:
-        image: mongo:7
+      postgres:
+        image: postgres:16
         ports:
-          - 27017:27017
+          - '5432:5432'
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mmabet
 
     steps:
       - name: Checkout du code
@@ -35,7 +39,7 @@ jobs:
       - name: Lancement des tests avec coverage
         run: npm run test:cov
         env:
-          MONGODB_URI: mongodb://localhost:27017/mmaBet-test
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/mmabet
           JWT_SECRET: ci_test_secret
           JWT_EXPIRATION: 7d
 

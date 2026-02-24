@@ -1,71 +1,62 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 
 import { CreateUserDto } from '@users/dto/create-user.dto';
 import { UpdateUserDto } from '@users/dto/update-user.dto';
 import { UpdatePictureDto } from '@users/dto/update-picture.dto';
 import { PasswordService } from '@users/services/password.service';
-import { UserEntity } from '@users/entities/user.entity';
-import { User } from '@users/interfaces/user.interface';
+import { User } from '@users/entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel('User') private userModel: Model<User>,
+    @InjectRepository(User) private userRepository: Repository<User>,
     private passwordService: PasswordService,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { password } = createUserDto;
     createUserDto.password = await this.passwordService.encryptPassword(
       password,
     );
-    const createdUser = new this.userModel(createUserDto);
-    await createdUser.save();
-    return new UserEntity(createdUser.toObject());
+
+    return await this.userRepository.save({ ...createUserDto });
   }
 
-  async findAll(): Promise<UserEntity[]> {
-    const users = await this.userModel.find();
-    return users.map((user) => new UserEntity(user.toObject()));
+  async findAll(): Promise<User[]> {
+    return await this.userRepository.find();
   }
 
-  async findOne(id: string): Promise<UserEntity> {
-    const user = await this.userModel.findById(id);
-    return new UserEntity(user.toObject());
+  async findOne(id: number): Promise<User> {
+    return await this.userRepository.findOneBy({ id });
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.userModel.findOne({ email });
+    return this.userRepository.findOneBy({ email });
   }
 
-  async updateUser(
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<UserEntity> {
-    const userUpdate = await this.userModel.findByIdAndUpdate(
-      id,
-      updateUserDto,
-      { new: true },
-    );
-    return new UserEntity(userUpdate.toObject());
+  async findByUsername(username: string): Promise<User | null> {
+    return this.userRepository.findOneBy({ username });
+  }
+
+  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    await this.userRepository.update(id, updateUserDto);
+    return await this.findOne(id);
   }
 
   async updatePicture(
-    id: string,
+    id: number,
     updatePictureDto: UpdatePictureDto,
-  ): Promise<UserEntity> {
+  ): Promise<User> {
     const { filename } = updatePictureDto;
-    const userUpdated = await this.userModel.findByIdAndUpdate(
-      id,
-      { picture: filename },
-      { new: true },
-    );
-    return new UserEntity(userUpdated.toObject());
+    await this.userRepository.update(id, {
+      picture: filename,
+    });
+    return await this.findOne(id);
   }
 
-  async deleteUser(id: string) {
-    return this.userModel.findByIdAndDelete(id);
+  async deleteUser(id: number) {
+    return this.userRepository.delete(id);
   }
 }

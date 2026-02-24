@@ -1,27 +1,26 @@
 services:
-  # --- Base de données ---
-  mongo:
-    image: mongo:7
-    container_name: mma-bet-mongo
-    restart: unless-stopped
+  postgres:
+    image: postgres:16
+    container_name: mma-bet-postgres
     ports:
-      - '27017:27017'
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mmabet
     volumes:
-      - mongo-data:/data/db
+      - postgres-data:/var/lib/postgresql/data
 
-  # --- API NestJS ---
   api:
     build: .
     container_name: mma-bet-api
-    restart: unless-stopped
     ports:
       - '3000:3000'
-    env_file:
-      - .env
+    env_file: .env
     environment:
-      MONGODB_URI: mongodb://mongo:27017/mmaBet
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/mmabet
     depends_on:
-      - mongo
+      - postgres
 
 volumes:
-  mongo-data:
+  postgres-data:

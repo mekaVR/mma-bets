@@ -4,14 +4,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 
 import { UsersService } from '@users/services/users.service';
 import { PasswordService } from '@users/services/password.service';
 import { CreateUserDto } from '@users/dto/create-user.dto';
-import { UserEntity } from '@users/entities/user.entity';
-import { User } from '@users/interfaces/user.interface';
+import { User } from '@users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -19,12 +16,11 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private passwordService: PasswordService,
-    @InjectModel('User') private userModel: Model<User>,
   ) {}
 
   async generateJWT(
     username: string,
-    id: string,
+    id: number,
   ): Promise<{ access_token: string }> {
     return {
       access_token: await this.jwtService.signAsync({
@@ -37,20 +33,18 @@ export class AuthService {
   async signUp(createUserDto: CreateUserDto) {
     const { email, username } = createUserDto;
 
-    const existingEmail = await this.userModel.findOne({ email });
+    const existingEmail = await this.usersService.findByEmail(email);
     if (existingEmail) {
       throw new ConflictException('Un utilisateur avec cet email existe déjà');
     }
 
-    const existingUsername = await this.userModel.findOne({ username });
+    const existingUsername = await this.usersService.findByUsername(username);
     if (existingUsername) {
       throw new ConflictException("Ce nom d'utilisateur est déjà pris");
     }
 
-    const createdUser: UserEntity = await this.usersService.createUser(
-      createUserDto,
-    );
-    return this.generateJWT(createdUser.username, createdUser.userId);
+    const createdUser: User = await this.usersService.createUser(createUserDto);
+    return this.generateJWT(createdUser.username, createdUser.id);
   }
 
   async signIn(email: string, password: string) {
@@ -69,6 +63,6 @@ export class AuthService {
       throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
 
-    return this.generateJWT(user.username, user._id.toString());
+    return this.generateJWT(user.username, user.id);
   }
 }

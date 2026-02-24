@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { getModelToken } from '@nestjs/mongoose';
 import { AuthService } from './auth.service';
 import { UsersService } from '@users/services/users.service';
 import { PasswordService } from '@users/services/password.service';
@@ -11,12 +10,20 @@ describe('AuthService', () => {
   let usersService: Partial<Record<keyof UsersService, jest.Mock>>;
   let jwtService: Partial<Record<keyof JwtService, jest.Mock>>;
   let passwordService: Partial<Record<keyof PasswordService, jest.Mock>>;
-  let userModel: Record<string, jest.Mock>;
+
+  const userId = 7;
+  const mockUser = {
+    id: userId,
+    username: 'testuser',
+    email: 'test@example.com',
+    password: 'hashed-password',
+  };
 
   beforeEach(async () => {
     usersService = {
       createUser: jest.fn(),
       findByEmail: jest.fn(),
+      findByUsername: jest.fn(),
     };
 
     jwtService = {
@@ -27,17 +34,12 @@ describe('AuthService', () => {
       isValidPassword: jest.fn(),
     };
 
-    userModel = {
-      findOne: jest.fn(),
-    };
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: UsersService, useValue: usersService },
         { provide: JwtService, useValue: jwtService },
         { provide: PasswordService, useValue: passwordService },
-        { provide: getModelToken('User'), useValue: userModel },
       ],
     }).compile();
 
@@ -50,12 +52,12 @@ describe('AuthService', () => {
 
   describe('generateJWT', () => {
     it('should return an access token', async () => {
-      const result = await authService.generateJWT('testuser', 'user-id-123');
+      const result = await authService.generateJWT('testuser', userId);
 
       expect(result).toEqual({ access_token: 'mock-jwt-token' });
       expect(jwtService.signAsync).toHaveBeenCalledWith({
         username: 'testuser',
-        id: 'user-id-123',
+        id: userId,
       });
     });
   });
@@ -68,24 +70,20 @@ describe('AuthService', () => {
     };
 
     it('should create a user and return a JWT token', async () => {
-      userModel.findOne.mockResolvedValue(null);
-      usersService.createUser.mockResolvedValue({
-        username: 'testuser',
-        userId: 'user-id-123',
-      });
+      usersService.findByEmail.mockResolvedValue(null);
+      usersService.findByUsername.mockResolvedValue(null);
+      usersService.createUser.mockResolvedValue(mockUser);
 
       const result = await authService.signUp(createUserDto);
 
       expect(result).toEqual({ access_token: 'mock-jwt-token' });
-      expect(userModel.findOne).toHaveBeenCalledWith({
-        email: 'test@example.com',
-      });
-      expect(userModel.findOne).toHaveBeenCalledWith({ username: 'testuser' });
+      expect(usersService.findByEmail).toHaveBeenCalledWith('test@example.com');
+      expect(usersService.findByUsername).toHaveBeenCalledWith('testuser');
       expect(usersService.createUser).toHaveBeenCalledWith(createUserDto);
     });
 
     it('should throw ConflictException if email already exists', async () => {
-      userModel.findOne.mockResolvedValueOnce({ email: 'test@example.com' });
+      usersService.findByEmail.mockResolvedValue(mockUser);
 
       await expect(authService.signUp(createUserDto)).rejects.toThrow(
         ConflictException,
@@ -94,9 +92,8 @@ describe('AuthService', () => {
     });
 
     it('should throw ConflictException if username already exists', async () => {
-      userModel.findOne
-        .mockResolvedValueOnce(null) // email check passes
-        .mockResolvedValueOnce({ username: 'testuser' }); // username check fails
+      usersService.findByEmail.mockResolvedValue(null);
+      usersService.findByUsername.mockResolvedValue(mockUser);
 
       await expect(authService.signUp(createUserDto)).rejects.toThrow(
         ConflictException,
@@ -110,11 +107,7 @@ describe('AuthService', () => {
     const password = 'Password1';
 
     it('should return a JWT token on successful sign in', async () => {
-      usersService.findByEmail.mockResolvedValue({
-        _id: { toString: () => 'user-id-123' },
-        username: 'testuser',
-        password: 'hashed-password',
-      });
+      usersService.findByEmail.mockResolvedValue(mockUser);
       passwordService.isValidPassword.mockResolvedValue(true);
 
       const result = await authService.signIn(email, password);
@@ -123,7 +116,7 @@ describe('AuthService', () => {
       expect(usersService.findByEmail).toHaveBeenCalledWith(email);
       expect(passwordService.isValidPassword).toHaveBeenCalledWith(
         password,
-        'hashed-password',
+        mockUser.password,
       );
     });
 
@@ -137,11 +130,7 @@ describe('AuthService', () => {
     });
 
     it('should throw UnauthorizedException if password is invalid', async () => {
-      usersService.findByEmail.mockResolvedValue({
-        _id: { toString: () => 'user-id-123' },
-        username: 'testuser',
-        password: 'hashed-password',
-      });
+      usersService.findByEmail.mockResolvedValue(mockUser);
       passwordService.isValidPassword.mockResolvedValue(false);
 
       await expect(authService.signIn(email, password)).rejects.toThrow(

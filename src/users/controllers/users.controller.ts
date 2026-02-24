@@ -15,24 +15,24 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from '@users/services/users.service';
 import { UpdateUserDto } from '@users/dto/update-user.dto';
 import { storage } from '@users/utils/storage';
-import { UserEntity } from '@users/entities/user.entity';
+import { User } from '@users/entities/user.entity';
 
 @Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
 
   @Get()
-  getAll(): Promise<UserEntity[]> {
+  getAll(): Promise<User[]> {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  getUser(@Param('id') id: string): Promise<UserEntity> {
+  getUser(@Param('id') id: number): Promise<User> {
     return this.userService.findOne(id);
   }
   @Patch(':id')
   updateProfile(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateProfileDto: UpdateUserDto,
   ) {
     return this.userService.updateUser(id, updateProfileDto);
@@ -41,7 +41,7 @@ export class UsersController {
   @Put(':id/picture')
   @UseInterceptors(FileInterceptor('avatar', storage))
   updatePicture(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.userService.updatePicture(id, file);
@@ -49,7 +49,7 @@ export class UsersController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  deleteProfile(@Param('id') id: string) {
+  deleteProfile(@Param('id') id: number) {
     return this.userService.deleteUser(id);
   }
 }

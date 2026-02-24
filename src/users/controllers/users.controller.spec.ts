@@ -1,22 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from '@users/services/users.service';
-import { UserEntity } from '@users/entities/user.entity';
+import { UserRole } from '@users/entities/user.entity';
 
 describe('UsersController', () => {
   let controller: UsersController;
   let usersService: Partial<Record<keyof UsersService, jest.Mock>>;
 
-  const mockUserEntity = new UserEntity({
-    _id: 'user-id-123',
+  const userId = 7;
+  const mockUser = {
+    id: userId,
     username: 'testuser',
+    firstName: 'John',
+    lastName: 'Doe',
     email: 'test@example.com',
+    password: 'hashed-password',
     picture: null,
     score: 0,
-    rank: 0,
-    badges: [],
-    coinsBonus: 0,
-  });
+    role: UserRole.USER,
+  };
 
   beforeEach(async () => {
     usersService = {
@@ -41,58 +43,52 @@ describe('UsersController', () => {
 
   describe('getAll', () => {
     it('should return an array of users', async () => {
-      usersService.findAll.mockResolvedValue([mockUserEntity]);
+      usersService.findAll.mockResolvedValue([mockUser]);
 
       const result = await controller.getAll();
 
-      expect(result).toEqual([mockUserEntity]);
+      expect(result).toEqual([mockUser]);
       expect(usersService.findAll).toHaveBeenCalled();
     });
   });
 
   describe('getUser', () => {
     it('should return a single user by id', async () => {
-      usersService.findOne.mockResolvedValue(mockUserEntity);
+      usersService.findOne.mockResolvedValue(mockUser);
 
-      const result = await controller.getUser('user-id-123');
+      const result = await controller.getUser(userId);
 
-      expect(result).toEqual(mockUserEntity);
-      expect(usersService.findOne).toHaveBeenCalledWith('user-id-123');
+      expect(result).toEqual(mockUser);
+      expect(usersService.findOne).toHaveBeenCalledWith(userId);
     });
   });
 
   describe('updateProfile', () => {
     it('should update and return the user', async () => {
       const updateDto = { username: 'updated', email: 'updated@example.com' };
-      const updatedUser = new UserEntity({ ...mockUserEntity, ...updateDto });
+      const updatedUser = { ...mockUser, ...updateDto };
       usersService.updateUser.mockResolvedValue(updatedUser);
 
-      const result = await controller.updateProfile('user-id-123', updateDto);
+      const result = await controller.updateProfile(userId, updateDto);
 
       expect(result).toEqual(updatedUser);
-      expect(usersService.updateUser).toHaveBeenCalledWith(
-        'user-id-123',
-        updateDto,
-      );
+      expect(usersService.updateUser).toHaveBeenCalledWith(userId, updateDto);
     });
   });
 
   describe('updatePicture', () => {
     it('should update user picture', async () => {
       const mockFile = { filename: 'avatar.jpg' } as Express.Multer.File;
-      const updatedUser = new UserEntity({
-        ...mockUserEntity,
+      const updatedUser = {
+        ...mockUser,
         picture: 'avatar.jpg',
-      });
+      };
       usersService.updatePicture.mockResolvedValue(updatedUser);
 
-      const result = await controller.updatePicture('user-id-123', mockFile);
+      const result = await controller.updatePicture(userId, mockFile);
 
       expect(result).toEqual(updatedUser);
-      expect(usersService.updatePicture).toHaveBeenCalledWith(
-        'user-id-123',
-        mockFile,
-      );
+      expect(usersService.updatePicture).toHaveBeenCalledWith(userId, mockFile);
     });
   });
 
@@ -100,9 +96,9 @@ describe('UsersController', () => {
     it('should delete the user', async () => {
       usersService.deleteUser.mockResolvedValue(undefined);
 
-      await controller.deleteProfile('user-id-123');
+      await controller.deleteProfile(userId);
 
-      expect(usersService.deleteUser).toHaveBeenCalledWith('user-id-123');
+      expect(usersService.deleteUser).toHaveBeenCalledWith(userId);
     });
   });
 });
