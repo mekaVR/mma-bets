@@ -46,10 +46,6 @@ describe('AuthService', () => {
     authService = module.get<AuthService>(AuthService);
   });
 
-  it('should be defined', () => {
-    expect(authService).toBeDefined();
-  });
-
   describe('generateJWT', () => {
     it('should return an access token', async () => {
       const result = await authService.generateJWT('testuser', userId);

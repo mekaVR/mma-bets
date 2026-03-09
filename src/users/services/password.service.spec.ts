@@ -9,10 +9,6 @@ describe('PasswordService', () => {
     service = new PasswordService();
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-
   describe('encryptPassword', () => {
     it('should return a hashed password', async () => {
       const password = 'Password1';

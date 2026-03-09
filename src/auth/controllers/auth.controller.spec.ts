@@ -20,10 +20,6 @@ describe('AuthController', () => {
     controller = module.get<AuthController>(AuthController);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
-
   describe('signUp', () => {
     it('should call authService.signUp and return the result', async () => {
       const dto = {

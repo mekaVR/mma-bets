@@ -46,10 +46,6 @@ describe('AuthGuard', () => {
     } as unknown as ExecutionContext;
   }
 
-  it('should be defined', () => {
-    expect(guard).toBeDefined();
-  });
-
   it('should allow access to public routes', async () => {
     reflector.getAllAndOverride.mockReturnValue(true);
     const context = createMockContext();

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from '@users/services/users.service';
-import { UserRole } from '@users/entities/user.entity';
+import { UserRole } from '@users/constants/user.constants';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -35,10 +35,6 @@ describe('UsersController', () => {
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
-  });
-
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
   });
 
   describe('getAll', () => {

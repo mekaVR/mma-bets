@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { PasswordService } from './password.service';
-import { User, UserRole } from '@users/entities/user.entity';
+import { User } from '@users/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { UserRole } from '@users/constants/user.constants';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -44,10 +45,6 @@ describe('UsersService', () => {
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
   });
 
   describe('createUser', () => {
