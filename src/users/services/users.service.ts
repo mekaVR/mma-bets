@@ -28,6 +28,13 @@ export class UsersService {
     return await this.userRepository.find();
   }
 
+  async getRanking(): Promise<User[]> {
+    return await this.userRepository.find({
+      select: ['id', 'username', 'score', 'picture'],
+      order: { score: 'DESC' },
+    });
+  }
+
   async findOne(id: number): Promise<User> {
     return await this.userRepository.findOneBy({ id });
   }

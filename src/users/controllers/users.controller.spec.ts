@@ -1,33 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from '@users/services/users.service';
-import { UserRole } from '@users/constants/user.constants';
-import { AuthenticatedRequest } from '@auth/interfaces/authenticated-request.interface';
+import {
+  mockRankedUsers,
+  mockRequest,
+  mockUser,
+} from '@users/__mocks__/users.mocks';
 
 describe('UsersController', () => {
   let controller: UsersController;
   let usersService: Partial<Record<keyof UsersService, jest.Mock>>;
 
-  const userId = 7;
-  const mockRequest: AuthenticatedRequest = {
-    user: { id: userId, username: 'testuser' },
-  } as AuthenticatedRequest;
-
-  const mockUser = {
-    id: userId,
-    username: 'testuser',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'test@example.com',
-    password: 'hashed-password',
-    picture: null,
-    score: 0,
-    role: UserRole.USER,
-  };
-
   beforeEach(async () => {
     usersService = {
       findAll: jest.fn(),
+      getRanking: jest.fn(),
       findOne: jest.fn(),
       updateUser: jest.fn(),
       updatePicture: jest.fn(),
@@ -53,14 +40,25 @@ describe('UsersController', () => {
     });
   });
 
+  describe('getRanking', () => {
+    it('should return an array of user ordered by score', async () => {
+      usersService.getRanking.mockResolvedValue(mockRankedUsers);
+
+      const result = await controller.getRanking();
+
+      expect(result).toEqual(mockRankedUsers);
+      expect(usersService.getRanking).toHaveBeenCalled();
+    });
+  });
+
   describe('getUser', () => {
     it('should return a single user by id', async () => {
       usersService.findOne.mockResolvedValue(mockUser);
 
-      const result = await controller.getUser(userId);
+      const result = await controller.getUser(mockUser.id);
 
       expect(result).toEqual(mockUser);
-      expect(usersService.findOne).toHaveBeenCalledWith(userId);
+      expect(usersService.findOne).toHaveBeenCalledWith(mockUser.id);
     });
   });
 
@@ -73,7 +71,10 @@ describe('UsersController', () => {
       const result = await controller.updateProfile(mockRequest, updateDto);
 
       expect(result).toEqual(updatedUser);
-      expect(usersService.updateUser).toHaveBeenCalledWith(userId, updateDto);
+      expect(usersService.updateUser).toHaveBeenCalledWith(
+        mockUser.id,
+        updateDto,
+      );
     });
   });
 
@@ -89,7 +90,10 @@ describe('UsersController', () => {
       const result = await controller.updatePicture(mockRequest, mockFile);
 
       expect(result).toEqual(updatedUser);
-      expect(usersService.updatePicture).toHaveBeenCalledWith(userId, mockFile);
+      expect(usersService.updatePicture).toHaveBeenCalledWith(
+        mockUser.id,
+        mockFile,
+      );
     });
   });
 
@@ -99,7 +103,7 @@ describe('UsersController', () => {
 
       await controller.deleteProfile(mockRequest);
 
-      expect(usersService.deleteUser).toHaveBeenCalledWith(userId);
+      expect(usersService.deleteUser).toHaveBeenCalledWith(mockUser.id);
     });
   });
 });

@@ -29,10 +29,16 @@ export class UsersController {
     return this.userService.findAll();
   }
 
+  @Get('ranking')
+  getRanking(): Promise<User[]> {
+    return this.userService.getRanking();
+  }
+
   @Get(':id')
   getUser(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.userService.findOne(id);
   }
+
   @Patch()
   updateProfile(
     @Request() req: AuthenticatedRequest,
