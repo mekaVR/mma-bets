@@ -6,11 +6,12 @@ import { Bet } from '../entities/bet.entity';
 import { BetPick } from '../entities/bet-pick.entity';
 import { PG_UNIQUE_VIOLATION } from '../../constants/error-code.constant';
 import { ConflictException } from '@nestjs/common';
+import { Repository } from 'typeorm';
 
 describe('BetsServices', () => {
   let service: BetsServices;
-  let betRepository: any;
-  let betPickRepository: any;
+  let betRepository: Partial<Record<keyof Repository<Bet>, jest.Mock>>;
+  let betPickRepository: Partial<Record<keyof Repository<BetPick>, jest.Mock>>;
 
   const userId = 1;
   const createBetDto = {

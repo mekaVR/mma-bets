@@ -9,6 +9,7 @@ import { UsersService } from '@users/services/users.service';
 import { PasswordService } from '@users/services/password.service';
 import { CreateUserDto } from '@users/dto/create-user.dto';
 import { User } from '@users/entities/user.entity';
+import { ERROR_MESSAGES } from '../../constants/error-messages.constant';
 
 @Injectable()
 export class AuthService {
@@ -35,12 +36,12 @@ export class AuthService {
 
     const existingEmail = await this.usersService.findByEmail(email);
     if (existingEmail) {
-      throw new ConflictException('Un utilisateur avec cet email existe déjà');
+      throw new ConflictException(ERROR_MESSAGES.DUPLICATE_EMAIL);
     }
 
     const existingUsername = await this.usersService.findByUsername(username);
     if (existingUsername) {
-      throw new ConflictException("Ce nom d'utilisateur est déjà pris");
+      throw new ConflictException(ERROR_MESSAGES.DUPLICATE_USERNAME);
     }
 
     const createdUser: User = await this.usersService.createUser(createUserDto);
@@ -51,7 +52,7 @@ export class AuthService {
     const user = await this.usersService.findByEmail(email);
 
     if (!user) {
-      throw new UnauthorizedException('Email ou mot de passe incorrect');
+      throw new UnauthorizedException(ERROR_MESSAGES.INVALID_CREDENTIALS);
     }
 
     const isValidPassword = await this.passwordService.isValidPassword(
@@ -60,7 +61,7 @@ export class AuthService {
     );
 
     if (!isValidPassword) {
-      throw new UnauthorizedException('Email ou mot de passe incorrect');
+      throw new UnauthorizedException(ERROR_MESSAGES.INVALID_CREDENTIALS);
     }
 
     return this.generateJWT(user.username, user.id);

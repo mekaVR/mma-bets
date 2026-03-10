@@ -2,12 +2,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from '@users/services/users.service';
 import { UserRole } from '@users/constants/user.constants';
+import { AuthenticatedRequest } from '@auth/interfaces/authenticated-request.interface';
 
 describe('UsersController', () => {
   let controller: UsersController;
   let usersService: Partial<Record<keyof UsersService, jest.Mock>>;
 
   const userId = 7;
+  const mockRequest: AuthenticatedRequest = {
+    user: { id: userId, username: 'testuser' },
+  } as AuthenticatedRequest;
+
   const mockUser = {
     id: userId,
     username: 'testuser',
@@ -65,7 +70,7 @@ describe('UsersController', () => {
       const updatedUser = { ...mockUser, ...updateDto };
       usersService.updateUser.mockResolvedValue(updatedUser);
 
-      const result = await controller.updateProfile(userId, updateDto);
+      const result = await controller.updateProfile(mockRequest, updateDto);
 
       expect(result).toEqual(updatedUser);
       expect(usersService.updateUser).toHaveBeenCalledWith(userId, updateDto);
@@ -81,7 +86,7 @@ describe('UsersController', () => {
       };
       usersService.updatePicture.mockResolvedValue(updatedUser);
 
-      const result = await controller.updatePicture(userId, mockFile);
+      const result = await controller.updatePicture(mockRequest, mockFile);
 
       expect(result).toEqual(updatedUser);
       expect(usersService.updatePicture).toHaveBeenCalledWith(userId, mockFile);
@@ -92,7 +97,7 @@ describe('UsersController', () => {
     it('should delete the user', async () => {
       usersService.deleteUser.mockResolvedValue(undefined);
 
-      await controller.deleteProfile(userId);
+      await controller.deleteProfile(mockRequest);
 
       expect(usersService.deleteUser).toHaveBeenCalledWith(userId);
     });

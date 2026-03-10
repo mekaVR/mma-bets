@@ -2,15 +2,16 @@ import { BetsController } from './bets.controller';
 import { BetsServices } from '../services/bets.services';
 import { Test, TestingModule } from '@nestjs/testing';
 import { BetStatus } from '../constants/bet.constants';
+import { AuthenticatedRequest } from '@auth/interfaces/authenticated-request.interface';
 
 describe('BetsController', () => {
   let controller: BetsController;
   let betsService: Partial<Record<keyof BetsServices, jest.Mock>>;
 
   const userId = 1;
-  const mockRequest = {
+  const mockRequest: AuthenticatedRequest = {
     user: { id: userId, username: 'testuser' },
-  };
+  } as AuthenticatedRequest;
 
   const mockBet = {
     id: 1,
@@ -46,10 +47,7 @@ describe('BetsController', () => {
     it('should create a bet', async () => {
       betsService.createBet.mockResolvedValue(mockBet);
 
-      const result = await controller.createBet(
-        mockRequest as any,
-        createBetDto,
-      );
+      const result = await controller.createBet(mockRequest, createBetDto);
 
       expect(betsService.createBet).toHaveBeenCalledWith(createBetDto, userId);
       expect(result).toEqual(mockBet);
@@ -60,7 +58,7 @@ describe('BetsController', () => {
     it('should return a bets', async () => {
       betsService.findByUser.mockResolvedValue([mockBet]);
 
-      const result = await controller.getMyBets(mockRequest as any);
+      const result = await controller.getMyBets(mockRequest);
 
       expect(betsService.findByUser).toHaveBeenCalledWith(userId);
       expect(result).toEqual([mockBet]);
