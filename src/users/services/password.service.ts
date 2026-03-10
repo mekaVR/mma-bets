@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { SALT_ROUNDS } from '@users/constants/password.constants';
+import { ERROR_MESSAGES } from '../../constants/error-messages.constant';
 
 @Injectable()
 export class PasswordService {
@@ -9,9 +10,7 @@ export class PasswordService {
       const salt: string = await bcrypt.genSalt(SALT_ROUNDS);
       return await bcrypt.hash(password, salt);
     } catch (e) {
-      throw new InternalServerErrorException(
-        'Échec du hashage du mot de passe',
-      );
+      throw new InternalServerErrorException(ERROR_MESSAGES.FAILURE_HASHAGE);
     }
   }
 
@@ -20,7 +19,7 @@ export class PasswordService {
       return await bcrypt.compare(password, hash);
     } catch (e) {
       throw new InternalServerErrorException(
-        'Échec de la vérification du mot de passe',
+        ERROR_MESSAGES.FAILURE_PASSWORD_VERIFICATION,
       );
     }
   }

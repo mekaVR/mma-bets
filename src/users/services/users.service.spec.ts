@@ -4,11 +4,12 @@ import { PasswordService } from './password.service';
 import { User } from '@users/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UserRole } from '@users/constants/user.constants';
+import { Repository } from 'typeorm';
 
 describe('UsersService', () => {
   let service: UsersService;
   let passwordService: Partial<Record<keyof PasswordService, jest.Mock>>;
-  let userRepository: any;
+  let userRepository: Partial<Record<keyof Repository<User>, jest.Mock>>;
 
   const userId = 7;
   const mockUser = {
