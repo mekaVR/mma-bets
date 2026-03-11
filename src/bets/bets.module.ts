@@ -11,4 +11,4 @@ import { BetPick } from './entities/bet-pick.entity';
   exports: [BetsServices],
   controllers: [BetsController],
 })
-export class BetsModules {}
+export class BetsModule {}

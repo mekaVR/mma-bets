@@ -13,9 +13,8 @@
     "paths": {
       "@auth/*": ["src/auth/*"],
       "@users/*": ["src/users/*"],
+      "@bets/*": ["src/bets/*"],
       "@fighters/*": ["src/fighters/*"],
-      "@fights/*": ["src/fights/*"],
-      "@events/*": ["src/events/*"],
       "@utils/*": ["src/utils/*"],
     },
     "incremental": true,
